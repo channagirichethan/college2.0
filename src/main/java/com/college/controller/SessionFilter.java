@@ -55,6 +55,14 @@ public class SessionFilter implements Filter {
 
     @Override
     public void destroy() {
-        // Cleanup logic, if any
+        // Clear all sessions when the filter is destroyed
+        Enumeration<String> sessionNames = filterConfig.getServletContext().getAttributeNames();
+        while (sessionNames.hasMoreElements()) {
+            String attributeName = sessionNames.nextElement();
+            if (attributeName.startsWith("jakarta.servlet.http.HttpSession#")) {
+                HttpSession session = (HttpSession) filterConfig.getServletContext().getAttribute(attributeName);
+                session.invalidate();
+            }
+        }
     }
 }
